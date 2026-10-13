@@ -1,0 +1,21 @@
+const router = require('express').Router();
+const { asyncHandler: h } = require('../middleware/errors');
+const customers = require('../controllers/customers');
+const orders = require('../controllers/orders');
+const followups = require('../controllers/followups');
+const dashboard = require('../controllers/dashboard');
+const woo = require('../controllers/woocommerce');
+
+router.get('/customers', h(customers.list));
+router.get('/customers/:id', h(customers.get));
+router.post('/customers', h(customers.create));
+router.put('/customers/:id', h(customers.update));
+router.delete('/customers/:id', h(customers.remove));
+router.get('/orders', h(orders.list));
+router.get('/orders/:id', h(orders.get));
+router.get('/dashboard/stats', h(dashboard.stats));
+router.get('/followups', h(followups.list));
+router.post('/followups', h(followups.save));
+router.get('/woocommerce/status', h(woo.status));
+router.post('/woocommerce/sync', h(woo.sync));
+module.exports = router;

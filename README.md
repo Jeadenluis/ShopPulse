@@ -57,6 +57,7 @@ npm run dev
 Frontend URL: **http://localhost:5173**
 
 **4. Log in** with the demo account: `admin@shoppulse.local` / `Demo@1234` (the login page has a *Fill in* button), or register a new account.
+In demo mode (in-memory data) the demo login and registration are on by default. With MySQL they are **off** by default: set `ALLOW_REGISTRATION=true` in `.env` to create your first account (then turn it off again), or `SEED_DEMO_USER=true` to create the demo login. See `.env.example`.
 
 If MySQL is not reachable, the backend prints `Starting in DEMO MODE` and the top bar shows **Demo mode · in-memory**. Changes in demo mode are kept in memory and reset when the backend restarts. To force demo mode even when MySQL is running, set `FORCE_DEMO_MODE=true` in `.env`.
 
@@ -113,7 +114,7 @@ All variables are documented in `.env.example`. Real keys belong only in your lo
    ```
 4. Restart the backend and click **Sync Now** (top bar or dashboard card).
 
-How sync works: the backend reads customers and orders (up to 500 of each) and upserts them by WooCommerce ID, so repeated syncs do not create duplicates. Guest-checkout orders create a customer from the billing email. Synced rows are labeled `woocommerce`; sample rows stay labeled `demo`. Sync is **read-only** toward WooCommerce. Use HTTPS for real stores (Basic auth); plain-HTTP local stores use query-string keys.
+How sync works: the backend reads customers and orders (up to 5,000 of each; the sync message says so if the limit is reached) and upserts them by WooCommerce ID, so repeated syncs do not create duplicates. Orders from registered customers are linked to their account even if the billing email differs; guest-checkout orders create a customer from the billing email. Synced rows are labeled `woocommerce`; sample rows stay labeled `demo`. Sync is **read-only** toward WooCommerce. Use HTTPS for real stores (Basic auth); plain-HTTP local stores use query-string keys.
 
 ## Using the app in a demo
 
@@ -160,7 +161,7 @@ Not tested:
 ## Known limitations
 
 - Demo-mode changes live in memory and reset on restart.
-- Auth token is stored in the browser's `localStorage` — fine for a local demo, not hardened for production (no rate limiting, no refresh tokens).
+- Auth token is stored in the browser's `localStorage` — fine for a local demo, not hardened for production (no refresh tokens). Login is limited to 10 attempts per 15 minutes and registration to 5 per hour, per IP address.
 - A completed follow-up stays completed for that customer + rule; it does not automatically reopen.
-- Sync reads at most 500 customers and 500 orders, never deletes local rows, and never writes to WooCommerce.
+- Sync reads at most 5,000 customers and 5,000 orders, never deletes local rows, and never writes to WooCommerce.
 - No email or SMS sending; messages are drafts only.

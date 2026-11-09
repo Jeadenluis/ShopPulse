@@ -14,7 +14,7 @@ app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (req, res) => res.json({
   status: 'ok', database: store.mode, demoReason: store.mode === 'memory' ? store.fallbackReason : null,
-  woocommerce: { configured: woo.getConfig().configured }, demoLogin: String(process.env.SEED_DEMO_USER).toLowerCase() !== 'false', time: new Date().toISOString(),
+  woocommerce: { configured: woo.getConfig().configured }, demoLogin: store.demoLogin, registration: store.registrationOpen, time: new Date().toISOString(),
 }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api', requireAuth, require('./routes/index'));

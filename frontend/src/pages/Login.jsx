@@ -38,7 +38,7 @@ export default function Login() {
           {error && <div className="form-error">{error}</div>}
           <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Create account'}</button>
         </form>
-        <button className="link" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); setErrors({}); }}>{mode === 'login' ? 'Need an account? Register' : 'Already registered? Log in'}</button>
+        {(health?.registration || mode === 'register') && <button className="link" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); setErrors({}); }}>{mode === 'login' ? 'Need an account? Register' : 'Already registered? Log in'}</button>}
         {health?.demoLogin && mode === 'login' && (
           <div className="demo-hint"><strong>Local demo login</strong><span>admin@shoppulse.local / Demo@1234</span><button className="btn btn-sm" onClick={() => setV({ ...v, email: 'admin@shoppulse.local', password: 'Demo@1234' })}>Fill in</button></div>
         )}

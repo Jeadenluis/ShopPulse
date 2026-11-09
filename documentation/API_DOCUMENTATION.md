@@ -9,8 +9,8 @@ Errors look like `{ "error": "message", "details": { "field": "message" } }` (`d
 | Method | Path | Description | Responses |
 |---|---|---|---|
 | GET | `/health` | Backend status: `database` (`mysql` or `memory`), `demoReason`, `woocommerce.configured`, `demoLogin` | 200 |
-| POST | `/auth/register` | Body `{ name, email, password (8–72 chars) }`. Returns `{ token, user }` | 201, 400, 409 |
-| POST | `/auth/login` | Body `{ email, password }`. Returns `{ token, user }` (token valid 8 h) | 200, 400, 401 |
+| POST | `/auth/register` | Body `{ name, email, password (8–72 chars) }`. Returns `{ token, user }`. Returns 403 when registration is turned off (`ALLOW_REGISTRATION`); limited to 5 per hour per IP | 201, 400, 403, 409, 429 |
+| POST | `/auth/login` | Body `{ email, password }`. Returns `{ token, user }` (token valid 8 h). Limited to 10 attempts per 15 min per IP | 200, 400, 401, 429 |
 | GET | `/auth/me` | Current user from token | 200, 401 |
 
 ## Customers

@@ -73,8 +73,9 @@ async function connect() {
              ON DUPLICATE KEY UPDATE woo_id=VALUES(woo_id), first_name=VALUES(first_name), last_name=VALUES(last_name),
              phone=COALESCE(VALUES(phone), phone), city=COALESCE(VALUES(city), city), source='woocommerce'`,
             [w.wooId || null, w.firstName, w.lastName, w.email, w.phone || null, w.city || null, toDb(w.createdAt) || new Date()]);
-          const [r] = await conn.query('SELECT id FROM customers WHERE email = ?', [w.email]);
-          emailToId.set(w.email.toLowerCase(), r[0].id);
+          // The upsert can match an existing row by woo_id whose email is different, so prefer the woo_id match.
+          const [r] = await conn.query('SELECT id FROM customers WHERE woo_id = ? OR email = ? ORDER BY (woo_id <=> ?) DESC LIMIT 1', [w.wooId || null, w.email, w.wooId || null]);
+          if (r[0]) emailToId.set(w.email.toLowerCase(), r[0].id);
         }
         let n = 0;
         for (const w of orders) {

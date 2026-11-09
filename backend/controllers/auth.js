@@ -7,6 +7,7 @@ const { EMAIL } = require('../middleware/validate');
 const issue = (u) => ({ token: jwt.sign({ sub: u.id, email: u.email, name: u.name }, JWT_SECRET, { expiresIn: JWT_EXPIRES }), user: { id: u.id, name: u.name, email: u.email } });
 
 exports.register = async (req, res) => {
+  if (!store.registrationOpen) return res.status(403).json({ error: 'Registration is turned off. Ask an administrator for an account (or set ALLOW_REGISTRATION=true in .env).' });
   const { name = '', email = '', password = '' } = req.body || {};
   const errors = {};
   if (!String(name).trim()) errors.name = 'Name is required.';

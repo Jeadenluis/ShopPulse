@@ -22,9 +22,11 @@ exports.sync = async (req, res) => {
     }
     try {
       const [wc, wo] = await Promise.all([woo.fetchCustomers(cfg), woo.fetchOrders(cfg)]);
-      const mapped = woo.mapToShopPulse(wc, wo);
+      const mapped = woo.mapToShopPulse(wc.items, wo.items);
       const counts = await store.db.upsertWoo(mapped);
-      const sync = await record({ status: 'success', message: `Synchronized ${counts.customers} customers and ${counts.orders} orders from ${host(cfg.url)}.`, lastSuccessAt: attemptedAt, customersSynced: counts.customers, ordersSynced: counts.orders });
+      const cut = [wc.truncated && 'customers', wo.truncated && 'orders'].filter(Boolean).join(' and ');
+      const limitNote = cut ? ` Limit reached: only the first ${woo.MAX_RECORDS.toLocaleString('en-US')} ${cut} were read.` : '';
+      const sync = await record({ status: 'success', message: `Synchronized ${counts.customers} customers and ${counts.orders} orders from ${host(cfg.url)}.${limitNote}`.slice(0, 255), lastSuccessAt: attemptedAt, customersSynced: counts.customers, ordersSynced: counts.orders });
       res.json({ ok: true, sync });
     } catch (err) {
       const message = err instanceof woo.WooError ? err.message : 'Synchronization failed unexpectedly. Check the backend terminal.';
